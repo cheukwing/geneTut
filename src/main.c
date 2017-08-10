@@ -22,9 +22,22 @@ chromosome_t rouletteSelect(chromosome_t *chrs, double sumFitness) {
   exit(EXIT_FAILURE);
 }
 
-chromosome_t generateRandom(int target) {
+chromosome_t generateRandom() {
   chromosome_t chr = {(__uint64_t) (rand() % (int) (pow(2, CHROMOSOME_SIZE)))};
   return chr;
+}
+
+chromosome_t mutate(chromosome_t child) {
+  __uint64_t mutationMask = 0;
+  for (int i = 0; i < CHROMOSOME_SIZE; ++i) {
+    if (drand48() < MUTATION_CHANCE) {
+      ++mutationMask;
+    }
+    mutationMask <<= 1;
+  }
+
+  child.gene_array = child.gene_array ^ mutationMask;
+  return child;
 }
 
 children_t breed(chromosome_t mother, chromosome_t father) {
@@ -35,22 +48,10 @@ children_t breed(chromosome_t mother, chromosome_t father) {
     fstChild.gene_array = (fstChild.gene_array & mask) + (father.gene_array & ~mask);
     sndChild.gene_array = (sndChild.gene_array & mask) + (mother.gene_array & ~mask);
   }
+  fstChild = mutate(fstChild);
+  sndChild = mutate(sndChild);
   children_t children = {fstChild, sndChild};
   return children;
-}
-
-chromosome_t mutate(chromosome_t child) {
-  __uint64_t mutationMask = 0;
-  for (int i = 0; i < CHROMOSOME_SIZE; ++i) {
-    // mutation chance for each bit 0.001
-    if (drand48() < MUTATION_CHANCE) {
-      ++mutationMask;
-    }
-    mutationMask <<= 1;
-  }
-
-  child.gene_array = child.gene_array ^ mutationMask;
-  return child;
 }
 
 // checks if target chromosome has occurred and returns it, else assigns fitness
@@ -126,7 +127,7 @@ int main() {
     exit(EXIT_FAILURE);
   }
   for (int i = 0; i < TOTAL_CHROMOSOMES; ++i) {
-    currentGen[i] = generateRandom(target);
+    currentGen[i] = generateRandom();
   }
 
   chromosome_t *potentialSolution = assignFitnessCheckTarget(currentGen, target);
@@ -135,7 +136,6 @@ int main() {
   int generation = 1;
   while (potentialSolution == NULL) {
     double sumFitness = 0;
-    printf("Summing fitness...\n");
     for (int i = 0; i < TOTAL_CHROMOSOMES; ++i) {
       sumFitness = currentGen[i].fitness;
     }
@@ -147,7 +147,6 @@ int main() {
       exit(EXIT_FAILURE);
     }
 
-    printf("Breeding...\n");
     // breed the next generation
     for (int i = 0; i < TOTAL_CHROMOSOMES / 2; i += 2) {
       chromosome_t mother = rouletteSelect(currentGen, sumFitness);
@@ -157,19 +156,18 @@ int main() {
 //        father = rouletteSelect(currentGen, sumFitness);
 //      } while (mother.gene_array == father.gene_array);
       children_t children = breed(mother, father);
-      nextGen[i] = mutate(children.fstChild);
-      nextGen[i + 1] = mutate(children.sndChild);
+      nextGen[i] = children.fstChild;
+      nextGen[i + 1] = children.sndChild;
     }
 
     free(currentGen);
     currentGen = nextGen;
-    printf("Checking fitness...\n");
     potentialSolution = assignFitnessCheckTarget(currentGen, target);
     printf("Generation %d have been bred...\n", generation);
     ++generation;
   }
 
-  printf("Found the solution!\n");
+  printf("Found a solution!\n");
   printGeneArray(potentialSolution->gene_array);
 
   free(currentGen);
