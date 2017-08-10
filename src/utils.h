@@ -8,7 +8,12 @@
 #define ORD_MINUS 11
 #define ORD_MULTIPLY 12
 
-typedef __uint64_t chromosome_t;
+typedef __uint64_t gene_array_t;
+
+typedef struct chromosome {
+  gene_array_t gene_array;
+  float fitness;
+} chromosome_t;
 
 typedef struct children {
   chromosome_t fstChild;
@@ -22,7 +27,7 @@ typedef enum gene {
 
 __uint64_t createMask(int);
 
-gene_t getGene(chromosome_t);
+gene_t getGene(gene_array_t);
 
 _Bool isNumeric(gene_t);
 

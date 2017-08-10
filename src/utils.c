@@ -51,7 +51,7 @@ gene_t decode(__uint8_t bits) {
   }
 }
 
-gene_t getGene(chromosome_t chromosome) {
-  __uint8_t geneBits = (__uint8_t) (chromosome & createMask(4));
+gene_t getGene(gene_array_t gene_array) {
+  __uint8_t geneBits = (__uint8_t) (gene_array & createMask(4));
   return decode(geneBits);
 }
