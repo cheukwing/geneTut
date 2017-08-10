@@ -67,7 +67,6 @@ chromosome_t *assignFitnessCheckTarget(chromosome_t *chrs, int target) {
 }
 
 // LEFT TO RIGHT EVALUATION
-// wrong somehwere
 int evaluate(gene_array_t gene_array) {
   gene_t gene;
   int genesEvaluated = 0;
@@ -151,10 +150,6 @@ int main() {
     for (int i = 0; i < TOTAL_CHROMOSOMES / 2; i += 2) {
       chromosome_t mother = rouletteSelect(currentGen, sumFitness);
       chromosome_t father = rouletteSelect(currentGen, sumFitness);
-//      // limit asexuality
-//      do {
-//        father = rouletteSelect(currentGen, sumFitness);
-//      } while (mother.gene_array == father.gene_array);
       children_t children = breed(mother, father);
       nextGen[i] = children.fstChild;
       nextGen[i + 1] = children.sndChild;
