@@ -8,7 +8,7 @@ int evaluate(gene_array_t gene_array);
 
 // PRE number of chrs is equal to TOTAL_CHROMOSOMES
 chromosome_t rouletteSelect(chromosome_t *chrs, double sumFitness) {
-  double random = (rand() / RAND_MAX) * sumFitness;
+  double random = drand48() * sumFitness;
   double cumulativeTotal = 0;
   for (int i = 0; i < TOTAL_CHROMOSOMES; ++i) {
     cumulativeTotal += chrs[i].fitness;
@@ -30,8 +30,8 @@ chromosome_t generateRandom(int target) {
 children_t breed(chromosome_t mother, chromosome_t father) {
   chromosome_t fstChild = mother;
   chromosome_t sndChild = father;
-  if (rand() / RAND_MAX < CROSSOVER_CHANCE) {
-    __uint64_t mask = createMask(rand() % 32);
+  if (drand48() < CROSSOVER_CHANCE) {
+    __uint64_t mask = createMask(rand() % CHROMOSOME_SIZE);
     fstChild.gene_array = (fstChild.gene_array & mask) + (father.gene_array & ~mask);
     sndChild.gene_array = (sndChild.gene_array & mask) + (mother.gene_array & ~mask);
   }
@@ -43,7 +43,7 @@ chromosome_t mutate(chromosome_t child) {
   __uint64_t mutationMask = 0;
   for (int i = 0; i < CHROMOSOME_SIZE; ++i) {
     // mutation chance for each bit 0.001
-    if (rand() / RAND_MAX < MUTATION_CHANCE) {
+    if (drand48() < MUTATION_CHANCE) {
       ++mutationMask;
     }
     mutationMask <<= 1;
@@ -104,6 +104,7 @@ int evaluate(gene_array_t gene_array) {
 
 int main() {
   srand((unsigned) time(NULL));
+  srand48(time(NULL));
 
   printf("Setting up the target...\n");
   gene_array_t targetGeneArray = 0;
@@ -150,11 +151,11 @@ int main() {
     // breed the next generation
     for (int i = 0; i < TOTAL_CHROMOSOMES / 2; i += 2) {
       chromosome_t mother = rouletteSelect(currentGen, sumFitness);
-      chromosome_t father;
-      // limit asexuality
-      do {
-        father = rouletteSelect(currentGen, sumFitness);
-      } while (mother.gene_array == father.gene_array);
+      chromosome_t father = rouletteSelect(currentGen, sumFitness);
+//      // limit asexuality
+//      do {
+//        father = rouletteSelect(currentGen, sumFitness);
+//      } while (mother.gene_array == father.gene_array);
       children_t children = breed(mother, father);
       nextGen[i] = mutate(children.fstChild);
       nextGen[i + 1] = mutate(children.sndChild);
