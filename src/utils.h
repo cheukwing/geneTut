@@ -5,7 +5,7 @@
 #define GENE_SIZE 4
 #define NUM_GENES CHROMOSOME_SIZE / GENE_SIZE
 #define CROSSOVER_CHANCE 0.7
-#define MUTATION_CHANCE 0.001
+#define MUTATION_CHANCE 0.1
 #define TOTAL_CHROMOSOMES 100
 
 typedef __uint64_t gene_array_t;
