@@ -60,7 +60,7 @@ chromosome_t *assignFitnessCheckTarget(chromosome_t *chrs, int target) {
     if (evaluation == target) {
       return &chrs[i];
     }
-    chrs[i].fitness = 1 / abs(evaluation - target);
+    chrs[i].fitness = 1.0 / abs(evaluation - target);
   }
   return NULL;
 }
@@ -118,7 +118,6 @@ int main() {
   printf("Can be reached via: ");
   printGeneArray(targetGeneArray);
 
-
   printf("Setting up the first generation...\n");
   chromosome_t *currentGen = malloc(sizeof(chromosome_t) * TOTAL_CHROMOSOMES);
   if (currentGen == NULL) {
@@ -135,6 +134,7 @@ int main() {
   int generation = 1;
   while (potentialSolution == NULL) {
     double sumFitness = 0;
+    printf("Summing fitness...\n");
     for (int i = 0; i < TOTAL_CHROMOSOMES; ++i) {
       sumFitness = currentGen[i].fitness;
     }
@@ -146,6 +146,7 @@ int main() {
       exit(EXIT_FAILURE);
     }
 
+    printf("Breeding...\n");
     // breed the next generation
     for (int i = 0; i < TOTAL_CHROMOSOMES / 2; i += 2) {
       chromosome_t mother = rouletteSelect(currentGen, sumFitness);
@@ -161,6 +162,7 @@ int main() {
 
     free(currentGen);
     currentGen = nextGen;
+    printf("Checking fitness...\n");
     potentialSolution = assignFitnessCheckTarget(currentGen, target);
     printf("Generation %d have been bred...\n", generation);
     ++generation;
