@@ -65,31 +65,32 @@ chromosome_t *assignFitnessCheckTarget(chromosome_t *chrs, int target) {
   return NULL;
 }
 
-// LEFT TO RIGHT EVALUTION
+// LEFT TO RIGHT EVALUATION
+// wrong somehwere
 int evaluate(gene_array_t gene_array) {
   gene_t gene;
-  int genesEvaulated = 0;
+  int genesEvaluated = 0;
   do {
     gene = getGene(gene_array);
-    gene_array <<= GENE_SIZE;
-    ++genesEvaulated;
+    gene_array >>= GENE_SIZE;
+    ++genesEvaluated;
   } while (!isNumeric(gene));
 
   int result = gene;
 
   // while have not checked all genes
-  while (genesEvaulated < NUM_GENES) {
+  while (genesEvaluated < NUM_GENES) {
     gene = getGene(gene_array);
-    gene_array <<= GENE_SIZE;
-    ++genesEvaulated;
+    gene_array >>= GENE_SIZE;
+    ++genesEvaluated;
     // find next operator, ignore all numeric
     if (isOperator(gene)) {
       func_t func = operatorToFunction(gene);
       // find next numeric, ignore all operator
-      while (genesEvaulated < NUM_GENES || !isNumeric(gene)) {
+      while (genesEvaluated < NUM_GENES && !isNumeric(gene)) {
         gene = getGene(gene_array);
         gene_array >>= GENE_SIZE;
-        ++genesEvaulated;
+        ++genesEvaluated;
       }
 
       // if found numeric, then apply with operator
@@ -109,7 +110,7 @@ int main() {
   // if i is even, then get a random numeric, else get a random operator
   for (int i = 0; i < NUM_GENES; ++i) {
     targetGeneArray <<= GENE_SIZE;
-    int randomGeneOrdinal = (i % 2) ? (rand() % MULTIPLY) + ADD : (rand() % ADD);
+    int randomGeneOrdinal = (i % 2) ? rand() % (NONE - ADD) + ADD : rand() % ADD;
     targetGeneArray += randomGeneOrdinal;
   }
   int target = evaluate(targetGeneArray);
