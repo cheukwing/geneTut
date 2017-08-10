@@ -27,7 +27,7 @@ chromosome_t generateRandom(int target) {
   return chr;
 }
 
-children_t breed(chromosome_t mother, chromosome_t father, int target) {
+children_t breed(chromosome_t mother, chromosome_t father) {
   chromosome_t fstChild = mother;
   chromosome_t sndChild = father;
   if (rand() / RAND_MAX < CROSSOVER_CHANCE) {
@@ -54,11 +54,11 @@ chromosome_t mutate(chromosome_t child) {
 }
 
 // checks if target chromosome has occurred and returns it, else assigns fitness
-chromosome_t assignFitnessCheckTarget(chromosome_t *chrs, int target) {
+chromosome_t *assignFitnessCheckTarget(chromosome_t *chrs, int target) {
   for (int i = 0; i < TOTAL_CHROMOSOMES; ++i) {
     int evaluation = evaluate(chrs[i].gene_array);
     if (evaluation == target) {
-      return chrs[i];
+      return &chrs[i];
     }
     chrs[i].fitness = 1 / abs(evaluation - target);
   }
@@ -109,7 +109,7 @@ int main() {
   // if i is even, then get a random numeric, else get a random operator
   for (int i = 0; i < NUM_GENES; ++i) {
     targetGeneArray <<= GENE_SIZE;
-    int randomGeneOrdinal = (i % 2) ? (rand() % NONE) + ADD : (rand() % ADD);
+    int randomGeneOrdinal = (i % 2) ? (rand() % MULTIPLY) + ADD : (rand() % ADD);
     targetGeneArray += randomGeneOrdinal;
   }
   int target = evaluate(targetGeneArray);
@@ -119,16 +119,55 @@ int main() {
 
 
   printf("Setting up the first generation...\n");
-  chromosome_t *chrs = malloc(sizeof(chromosome_t) * TOTAL_CHROMOSOMES);
-  if (chrs == NULL) {
-    perror("Could not allocate memory to chrs in main!");
+  chromosome_t *currentGen = malloc(sizeof(chromosome_t) * TOTAL_CHROMOSOMES);
+  if (currentGen == NULL) {
+    perror("Could not allocate memory to currentGen in main!\n");
     exit(EXIT_FAILURE);
   }
   for (int i = 0; i < TOTAL_CHROMOSOMES; ++i) {
-    chrs[i] = generateRandom(target);
+    currentGen[i] = generateRandom(target);
   }
-  assignFitnessCheckTarget(chrs, target);
 
+  chromosome_t *potentialSolution = assignFitnessCheckTarget(currentGen, target);
+  printf("Generation 0 have formed...\n");
 
+  int generation = 1;
+  while (potentialSolution == NULL) {
+    double sumFitness = 0;
+    for (int i = 0; i < TOTAL_CHROMOSOMES; ++i) {
+      sumFitness = currentGen[i].fitness;
+    }
+
+    chromosome_t *nextGen = malloc(sizeof(chromosome_t) * TOTAL_CHROMOSOMES);
+    if (nextGen == NULL) {
+      perror("Could not allocate memory to nextGen in main!\n");
+      free(currentGen);
+      exit(EXIT_FAILURE);
+    }
+
+    // breed the next generation
+    for (int i = 0; i < TOTAL_CHROMOSOMES / 2; i += 2) {
+      chromosome_t mother = rouletteSelect(currentGen, sumFitness);
+      chromosome_t father;
+      // limit asexuality
+      do {
+        father = rouletteSelect(currentGen, sumFitness);
+      } while (mother.gene_array == father.gene_array);
+      children_t children = breed(mother, father);
+      nextGen[i] = mutate(children.fstChild);
+      nextGen[i + 1] = mutate(children.sndChild);
+    }
+
+    free(currentGen);
+    currentGen = nextGen;
+    potentialSolution = assignFitnessCheckTarget(currentGen, target);
+    printf("Generation %d have been bred...\n", generation);
+    ++generation;
+  }
+
+  printf("Found the solution!\n");
+  printGeneArray(potentialSolution->gene_array);
+
+  free(currentGen);
   return EXIT_SUCCESS;
 }

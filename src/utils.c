@@ -92,8 +92,7 @@ gene_t getGene(gene_array_t gene_array) {
 
 void printGeneArray(gene_array_t gene_array) {
   for (int i = 0; i < NUM_GENES; ++i) {
-    printf(getGeneString(getGene(gene_array)));
-    printf(" ");
+    printf("%s ", getGeneString(getGene(gene_array)));
     gene_array >>= GENE_SIZE;
   }
   printf("\n");
