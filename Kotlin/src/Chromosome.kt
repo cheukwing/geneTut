@@ -1,6 +1,6 @@
 class Chromosome private constructor(val genes: Array<Gene>) {
 
-  constructor(): this(Array(NUM_GENES, {Gene((Math.random() * Short.MAX_VALUE).toShort())}))
+  constructor(): this(Array(NUM_GENES, {Gene((Math.random() * ('z'.toInt() + 1 - ' '.toInt()) + ' '.toInt()).toShort())}))
 
   constructor(str: String): this(str.map{c -> Gene(c)}.toTypedArray())
 

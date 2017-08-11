@@ -1,7 +1,7 @@
 const val NUM_GENES = 12
 const val SIZE_GENE = 16
 const val CROSSOVER_CHANCE = 0.7
-const val MUTATION_CHANCE = 0.001
+const val MUTATION_CHANCE = 0.01
 const val TOTAL_NUM_CHROMOSOMES = 1000
 
 fun rouletteSelect(chrFitPairs: List<Pair<Chromosome, Double>>, totalFitness: Double): Chromosome {
