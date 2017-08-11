@@ -4,8 +4,8 @@ class Chromosome private constructor(val genes: Array<Gene>) {
 
   constructor(str: String): this(str.map{c -> Gene(c)}.toTypedArray())
 
-  private fun mutate() {
-    genes.map({it.mutate()})
+  private fun mutate(): Chromosome {
+    return Chromosome(genes.map({it.mutate()}).toTypedArray())
   }
 
   private fun copyOf(): Chromosome {
@@ -17,36 +17,36 @@ class Chromosome private constructor(val genes: Array<Gene>) {
     var sndChild = partner.copyOf()
     if (Math.random() < CROSSOVER_CHANCE) {
       val crossoverPos = (Math.random() * NUM_GENES * SIZE_GENE).toInt()
-      val geneIndex = crossoverPos / NUM_GENES
-      val innerIndex = crossoverPos % NUM_GENES
+      val geneIndex = crossoverPos / SIZE_GENE
+      val innerIndex = crossoverPos % SIZE_GENE
       val fstMix = this.genes[geneIndex].crossover(partner.genes[geneIndex], innerIndex)
       val sndMix = partner.genes[geneIndex].crossover(partner.genes[geneIndex], innerIndex)
 
       val fstGenes = Array(NUM_GENES, {i ->
         if (i < geneIndex) {
-          this.genes[geneIndex]
+          this.genes[i]
         } else if (i == geneIndex) {
           fstMix
         } else {
-          partner.genes[geneIndex]
+          partner.genes[i]
         }
       })
 
       val sndGenes = Array(NUM_GENES, {i ->
         if (i < geneIndex) {
-          partner.genes[geneIndex]
+          partner.genes[i]
         } else if (i == geneIndex) {
           sndMix
         } else {
-          partner.genes[geneIndex]
+          this.genes[i]
         }
       })
 
       fstChild = Chromosome(fstGenes)
       sndChild = Chromosome(sndGenes)
     }
-    fstChild.mutate()
-    sndChild.mutate()
+    fstChild = fstChild.mutate()
+    sndChild = sndChild.mutate()
     return Pair(fstChild, sndChild)
   }
 
