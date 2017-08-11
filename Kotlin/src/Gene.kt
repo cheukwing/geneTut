@@ -31,4 +31,8 @@ class Gene(val value: Short) {
     }
     return Gene(value.xor(mutationMask.toShort()))
   }
+
+  fun absDiff(other: Gene): Int {
+    return Math.abs(this.value - other.value)
+  }
 }

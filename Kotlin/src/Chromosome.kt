@@ -51,4 +51,9 @@ class Chromosome private constructor(val genes: Array<Gene>) {
     return Children(fstChild, sndChild)
   }
 
+  fun fitness(target: Array<Gene>): Double {
+    val sumDiff = genes.zip(target).map{(i, j) -> i.absDiff(j)}.reduce(Int::plus)
+    return 1.0 / sumDiff
+  }
+
 }
