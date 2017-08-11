@@ -12,7 +12,7 @@ class Chromosome private constructor(val genes: Array<Gene>) {
     return Chromosome(genes.copyOf())
   }
 
-  fun breed(partner: Chromosome): Children {
+  fun breed(partner: Chromosome): Pair<Chromosome, Chromosome> {
     var fstChild = this.copyOf()
     var sndChild = partner.copyOf()
     if (Math.random() < CROSSOVER_CHANCE) {
@@ -47,11 +47,11 @@ class Chromosome private constructor(val genes: Array<Gene>) {
     }
     fstChild.mutate()
     sndChild.mutate()
-    return Children(fstChild, sndChild)
+    return Pair(fstChild, sndChild)
   }
 
-  fun fitness(target: Array<Gene>): Double {
-    val sumDiff = genes.zip(target).map{(i, j) -> i.absDiff(j)}.reduce(Int::plus)
+  fun fitness(target: Chromosome): Double {
+    val sumDiff = genes.zip(target.genes).map{(i, j) -> i.absDiff(j)}.reduce(Int::plus)
     return 1.0 / sumDiff
   }
 

@@ -13,15 +13,31 @@ fun rouletteSelect(chrFitPairs: List<Pair<Chromosome, Double>>, totalFitness: Do
       return chr
     }
   }
+  println("Probable error occurred...")
   return chrFitPairs.last().first
 }
 
 fun main(args: Array<String>) {
-  var currentGen = Array(TOTAL_NUM_CHROMOSOMES, {Chromosome()})
   val target = Chromosome("Hello World!")
-  println(target)
+  println("Target: " + target)
+
+  println("Forming Generation 0...")
+  var currentGen = Array(TOTAL_NUM_CHROMOSOMES, {Chromosome()})
+  var solution = currentGen.dropWhile({c -> c.compareTo(target) != 0}).getOrNull(0)
+  while (solution == null) {
+    val currentGenFitness = currentGen.map{c -> c.fitness(target)}
+    val totalFitness = currentGenFitness.reduce(Double::plus)
+    val chrFitPairs = currentGen.zip(currentGenFitness)
+
+    val bredChildren = Array(TOTAL_NUM_CHROMOSOMES / 2, {
+      rouletteSelect(chrFitPairs, totalFitness).breed(
+          rouletteSelect(chrFitPairs, totalFitness))
+    })
 
 
 
+  }
+
+  println("Solution found: " + solution)
 }
 
