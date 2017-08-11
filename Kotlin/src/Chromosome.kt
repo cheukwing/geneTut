@@ -1,9 +1,8 @@
 class Chromosome private constructor(val genes: Array<Gene>) {
 
-  fun generateRandom(): Chromosome {
-    val randGenes = Array(NUM_GENES, {i -> Gene((Math.random() * Short.MAX_VALUE).toShort())})
-    return Chromosome(randGenes);
-  }
+  constructor(): this(Array(NUM_GENES, {Gene((Math.random() * Short.MAX_VALUE).toShort())}))
+
+  constructor(str: String): this(str.map{c -> Gene(c)}.toTypedArray())
 
   private fun mutate() {
     genes.map({it.mutate()})
@@ -56,4 +55,23 @@ class Chromosome private constructor(val genes: Array<Gene>) {
     return 1.0 / sumDiff
   }
 
+  override fun toString(): String {
+    return genes.map{g -> g.value.toChar()}.toString()
+  }
+
+  fun compareTo(other: Chromosome): Int {
+    val thisGenes = this.genes
+    val size = thisGenes.size
+    val otherGenes = other.genes
+    if (otherGenes.size == size) {
+      for (i in 0..size) {
+        val diff = thisGenes[i].value - otherGenes[i].value
+        if (diff != 0) {
+          return diff
+        }
+      }
+      return 0
+    }
+    return size - otherGenes.size
+  }
 }

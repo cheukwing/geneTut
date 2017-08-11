@@ -3,6 +3,9 @@ import kotlin.experimental.inv
 import kotlin.experimental.xor
 
 class Gene(val value: Short) {
+
+  constructor(char: Char): this(char.toShort())
+
   fun createMask(lower: Int, upper: Int): Short {
     var mask = 0
     val range = upper - lower
