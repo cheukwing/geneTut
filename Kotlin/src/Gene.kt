@@ -9,7 +9,7 @@ class Gene(val value: Short) {
   fun createMask(lower: Int, upper: Int): Short {
     var mask = 0
     val range = upper - lower
-    for (i in 0..range) {
+    for (i in 0..range - 1) {
       mask = mask.shl(1)
       ++mask
     }
@@ -26,7 +26,7 @@ class Gene(val value: Short) {
 
   fun mutate(): Gene {
     var mutationMask = 0
-    for (i in 0..SIZE_GENE) {
+    for (i in 0..SIZE_GENE - 1) {
       if (Math.random() < MUTATION_CHANCE) {
         ++mutationMask
       }

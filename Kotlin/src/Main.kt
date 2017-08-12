@@ -4,7 +4,8 @@ const val CROSSOVER_CHANCE = 0.7
 const val MUTATION_CHANCE = 0.01
 const val TOTAL_NUM_CHROMOSOMES = 1000
 
-fun rouletteSelect(chrFitPairs: List<Pair<Chromosome, Double>>, totalFitness: Double): Chromosome {
+fun rouletteSelect(chrFitPairs: List<Pair<Chromosome,
+    Double>>, totalFitness: Double): Chromosome {
   val selection = Math.random() * totalFitness
   var currTotal = 0.0
   for ((chr, fit) in chrFitPairs) {
@@ -19,33 +20,39 @@ fun rouletteSelect(chrFitPairs: List<Pair<Chromosome, Double>>, totalFitness: Do
 
 
 fun main(args: Array<String>) {
-
   val target = Chromosome("Hello World!")
-  println("Target: " + target)
+  println("Target: $target")
 
   println("Forming Generation 0...")
   var currentGen = Array(TOTAL_NUM_CHROMOSOMES, {Chromosome()})
-  var solution = currentGen.dropWhile({c -> c.compareTo(target) != 0}).getOrNull(0)
+  var solution = currentGen.dropWhile({it.compareTo(target) != 0})
+      .firstOrNull()
   var generation = 0
+
   while (solution == null) {
-    println("Random: " + currentGen[50])
-    val currentGenFitness = currentGen.map{c -> c.fitness(target)}
-    val totalFitness = currentGenFitness.reduce(Double::plus)
+    println("DEBUG PRINT - 50th Element:  ${currentGen[50]}")
+    val currentGenFitness = currentGen.map{it.fitness(target)}
+    val totalFitness = currentGenFitness.sum()
     val chrFitPairs = currentGen.zip(currentGenFitness)
 
-    val childPairs: Array<Pair<Chromosome, Chromosome>> = Array(TOTAL_NUM_CHROMOSOMES / 2, {
-      rouletteSelect(chrFitPairs, totalFitness).breed(
-          rouletteSelect(chrFitPairs, totalFitness))
+    val childPairs: Array<Pair<Chromosome, Chromosome>> =
+        Array(TOTAL_NUM_CHROMOSOMES / 2, {
+          rouletteSelect(chrFitPairs, totalFitness)
+              .breed(rouletteSelect(chrFitPairs, totalFitness))
     })
 
-    println("Generation " + generation + " have been bred...")
-    currentGen = Array(TOTAL_NUM_CHROMOSOMES, {i ->
-      if (i % 2 == 0) childPairs[i / 2].first else childPairs[i / 2].second
+    println("Generation $generation have been bred...")
+
+    currentGen = Array(TOTAL_NUM_CHROMOSOMES, {
+      if (it % 2 == 0) childPairs[it / 2].first else childPairs[it / 2].second
     })
-    solution = currentGen.dropWhile({c -> c.compareTo(target) != 0}).getOrNull(0)
+
+    solution = currentGen.dropWhile({it.compareTo(target) != 0})
+        .firstOrNull()
+
     ++generation
   }
 
-  println("Solution found: " + solution)
+  println("Solution found: $solution")
 }
 

@@ -1,11 +1,14 @@
 class Chromosome private constructor(val genes: Array<Gene>) {
 
-  constructor(): this(Array(NUM_GENES, {Gene((Math.random() * ('z'.toInt() + 1 - ' '.toInt()) + ' '.toInt()).toShort())}))
+  constructor() : this(
+      Array(NUM_GENES, {
+        Gene((Math.random() * ('z'.toInt() + 1 - ' '.toInt()) + ' '.toInt()).toShort())
+      }))
 
-  constructor(str: String): this(str.map{c -> Gene(c)}.toTypedArray())
+  constructor(str: String) : this(str.map { Gene(it) }.toTypedArray())
 
   private fun mutate(): Chromosome {
-    return Chromosome(genes.map({it.mutate()}).toTypedArray())
+    return Chromosome(genes.map({ it.mutate() }).toTypedArray())
   }
 
   private fun copyOf(): Chromosome {
@@ -19,26 +22,28 @@ class Chromosome private constructor(val genes: Array<Gene>) {
       val crossoverPos = (Math.random() * NUM_GENES * SIZE_GENE).toInt()
       val geneIndex = crossoverPos / SIZE_GENE
       val innerIndex = crossoverPos % SIZE_GENE
-      val fstMix = this.genes[geneIndex].crossover(partner.genes[geneIndex], innerIndex)
-      val sndMix = partner.genes[geneIndex].crossover(partner.genes[geneIndex], innerIndex)
+      val fstMix = this.genes[geneIndex]
+          .crossover(partner.genes[geneIndex], innerIndex)
+      val sndMix = partner.genes[geneIndex]
+          .crossover(partner.genes[geneIndex], innerIndex)
 
-      val fstGenes = Array(NUM_GENES, {i ->
-        if (i < geneIndex) {
-          this.genes[i]
-        } else if (i == geneIndex) {
+      val fstGenes = Array(NUM_GENES, {
+        if (it < geneIndex) {
+          this.genes[it]
+        } else if (it == geneIndex) {
           fstMix
         } else {
-          partner.genes[i]
+          partner.genes[it]
         }
       })
 
-      val sndGenes = Array(NUM_GENES, {i ->
-        if (i < geneIndex) {
-          partner.genes[i]
-        } else if (i == geneIndex) {
+      val sndGenes = Array(NUM_GENES, {
+        if (it < geneIndex) {
+          partner.genes[it]
+        } else if (it == geneIndex) {
           sndMix
         } else {
-          this.genes[i]
+          this.genes[it]
         }
       })
 
@@ -47,16 +52,19 @@ class Chromosome private constructor(val genes: Array<Gene>) {
     }
     fstChild = fstChild.mutate()
     sndChild = sndChild.mutate()
+
     return Pair(fstChild, sndChild)
   }
 
   fun fitness(target: Chromosome): Double {
-    val sumDiff = genes.zip(target.genes).map{(i, j) -> i.absDiff(j)}.reduce(Int::plus)
+    val sumDiff = genes.zip(target.genes)
+        .map { (i, j) -> i.absDiff(j) }
+        .sum()
     return 1.0 / sumDiff
   }
 
   override fun toString(): String {
-    return genes.map{g -> g.value.toChar()}.toString()
+    return genes.map { it.value.toChar() }.toString()
   }
 
   fun compareTo(other: Chromosome): Int {
@@ -64,7 +72,7 @@ class Chromosome private constructor(val genes: Array<Gene>) {
     val size = thisGenes.size
     val otherGenes = other.genes
     if (otherGenes.size == size) {
-      for (i in 0..size) {
+      for (i in 0..size - 1) {
         val diff = thisGenes[i].value - otherGenes[i].value
         if (diff != 0) {
           return diff
