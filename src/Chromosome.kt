@@ -72,7 +72,7 @@ class Chromosome private constructor(val genes: Array<Gene>) {
     val size = thisGenes.size
     val otherGenes = other.genes
     if (otherGenes.size == size) {
-      for (i in 0..size - 1) {
+      for (i in 0 until size) {
         val diff = thisGenes[i].value - otherGenes[i].value
         if (diff != 0) {
           return diff

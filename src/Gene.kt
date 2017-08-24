@@ -26,7 +26,7 @@ class Gene(val value: Short) {
 
   fun mutate(): Gene {
     var mutationMask = 0
-    for (i in 0..SIZE_GENE - 1) {
+    for (i in 0 until SIZE_GENE) {
       if (Math.random() < MUTATION_CHANCE) {
         ++mutationMask
       }
